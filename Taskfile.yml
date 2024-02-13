@@ -15,7 +15,7 @@ vars:
     DOCKER_COMPOSE_UP: "{{.DOCKER_COMPOSE}} up -d"
     DOCKER_COMPOSE_STOP: "{{.DOCKER_COMPOSE}} stop"
     CONTAINER_SERVICE_PHP_NAME: php
-    CONTAINER_PHP_NAME: symfony-api-php-1
+    CONTAINER_PHP_NAME: symfony-api-bootstrap-php-1
     IS_CONTAINER_RUNNING: "{{.DOCKER}} ps {{.CONTAINER_SERVICE_PHP_NAME}} | grep {{.CONTAINER_SERVICE_PHP_NAME}}"
 
 tasks:
