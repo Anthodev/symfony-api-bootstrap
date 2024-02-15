@@ -35,10 +35,15 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
     private string $username;
 
+    #[Assert\Length(min: 12, max: 255, minMessage: 'Your password must be at least {{ limit }} characters long.')]
     #[ORM\Column(type: Types::STRING, length: 255)]
     private string $password;
 
+    #[Assert\Length(min: 12, max: 255, minMessage: 'Your password must be at least {{ limit }} characters long.'), Assert\PasswordStrength]
     private ?string $plainPassword;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $enabled = false;
 
     private Role $role;
 
@@ -86,6 +91,18 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     public function setPlainPassword(string $plainPassword): static
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): static
+    {
+        $this->enabled = $enabled;
 
         return $this;
     }
