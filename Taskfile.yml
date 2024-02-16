@@ -62,7 +62,7 @@ tasks:
             - t
         desc: "Run the tests"
         cmds:
-            - "{{.DOCKER_EXEC}} {{.CONTAINER_PHP_NAME}} php vendor/bin/pest -d memory_limit=-1"
+            - "{{.DOCKER_COMPOSE}} run -e APP_ENV=test php php vendor/bin/pest -d memory_limit=-1"
         status:
             - "{{.IS_CONTAINER_RUNNING}}"
         silent: false

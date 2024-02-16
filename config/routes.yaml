@@ -3,3 +3,7 @@
 #        path: ../src/Controller/
 #        namespace: App\Controller
 #    type: attribute
+user_actions:
+    resource: ../src/Domain/User/Action/
+    type: attribute
+    prefix: /api

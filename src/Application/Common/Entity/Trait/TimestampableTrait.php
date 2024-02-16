@@ -20,7 +20,6 @@ trait TimestampableTrait
         return $this->createdAt;
     }
 
-    #[ORM\PrePersist]
     public function setCreatedAt(\DateTimeInterface $createdAt): static
     {
         $this->createdAt = $createdAt;
@@ -33,7 +32,6 @@ trait TimestampableTrait
         return $this->updatedAt;
     }
 
-    #[ORM\PreUpdate]
     public function setUpdatedAt(\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
