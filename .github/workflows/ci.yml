@@ -56,6 +56,8 @@ jobs:
       -
         name: Run PestPHP
         run: docker compose exec -T php vendor/bin/pest
+        env:
+          APP_ENV: test
       -
         name: Doctrine Schema Validator
         run: docker compose exec -T php bin/console -e test doctrine:schema:validate --skip-sync
