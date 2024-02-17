@@ -7,25 +7,21 @@ namespace App\Domain\User\Entity;
 use App\Application\Common\Entity\EntityInterface;
 use App\Application\Common\Entity\Trait\IdTrait;
 use App\Application\Common\Entity\Trait\TimestampableTrait;
-use App\Domain\User\Repository\UserRepository;
+use App\Domain\User\Repository\PendingRegistrationRepository;
+use App\Domain\User\Validator as UserValidator;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'users')]
+#[ORM\Entity(repositoryClass: PendingRegistrationRepository::class)]
+#[ORM\Table(name: 'pending_registrations')]
 #[ORM\HasLifecycleCallbacks]
-#[UniqueEntity(fields: ['email'], message: 'This email is already used.')]
-#[UniqueEntity(fields: ['username'], message: 'This username is already used.')]
-class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserInterface
+#[UserValidator\PendingRegistrationNotExists]
+class PendingRegistration implements EntityInterface, PasswordAuthenticatedUserInterface
 {
     use IdTrait;
     use TimestampableTrait;
-    use SoftDeleteableEntity;
 
     #[Assert\NotBlank, Assert\Email]
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
@@ -42,8 +38,11 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
     #[Assert\Length(min: 12, max: 255, minMessage: 'Your password must be at least {{ limit }} characters long.'), Assert\PasswordStrength]
     private ?string $plainPassword;
 
-    #[ORM\Column(type: Types::BOOLEAN)]
-    private bool $enabled = false;
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    private string $token;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private \DateTime $expiresAt;
 
     #[ORM\ManyToOne(targetEntity: Role::class)]
     private Role $role;
@@ -96,14 +95,26 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
         return $this;
     }
 
-    public function isEnabled(): bool
+    public function getToken(): string
     {
-        return $this->enabled;
+        return $this->token;
     }
 
-    public function setEnabled(bool $enabled): static
+    public function setToken(string $token): static
     {
-        $this->enabled = $enabled;
+        $this->token = $token;
+
+        return $this;
+    }
+
+    public function getExpiresAt(): \DateTime
+    {
+        return $this->expiresAt;
+    }
+
+    public function setExpiresAt(\DateTime $expiresAt): static
+    {
+        $this->expiresAt = $expiresAt;
 
         return $this;
     }
@@ -120,21 +131,8 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
         return $this;
     }
 
-    public function getRoles(): array
-    {
-        /** @var string $roleCode */
-        $roleCode = $this->role->getCode();
-
-        return [$roleCode];
-    }
-
     public function eraseCredentials(): void
     {
         $this->plainPassword = null;
-    }
-
-    public function getUserIdentifier(): string
-    {
-        return $this->getEmail();
     }
 }

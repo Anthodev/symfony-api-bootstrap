@@ -8,8 +8,8 @@ use App\Application\Common\Enum\HttpMethodEnum;
 use App\Application\Common\Exception\BadRequestHttpException;
 use App\Application\Common\Exception\ValidationException;
 use App\Application\Common\Exception\ValidationHttpException;
-use App\Domain\User\Dto\RegisterUserInput;
-use App\Domain\User\UseCase\RegisterUserUseCase;
+use App\Domain\User\Dto\RegisterPendingRegistrationInput;
+use App\Domain\User\UseCase\RegisterPendingRegistrationUseCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -20,16 +20,16 @@ use Symfony\Component\Routing\Attribute\Route;
 readonly class RegisterAction
 {
     public function __construct(
-        private RegisterUserUseCase $registerUserUseCase,
+        private RegisterPendingRegistrationUseCase $registerPendingRegistrationUseCase,
     ) {
     }
 
     #[Route('/register', name: 'register', methods: [HttpMethodEnum::POST->value])]
     public function register(
-        #[MapRequestPayload] RegisterUserInput $registerUserInput,
+        #[MapRequestPayload] RegisterPendingRegistrationInput $registerPendingRegistrationInput,
     ): Response {
         try {
-            $this->registerUserUseCase->registerUser($registerUserInput);
+            $this->registerPendingRegistrationUseCase->registerPendingRegistration($registerPendingRegistrationInput);
         } catch (ValidationException $e) {
             throw new ValidationHttpException($e->getMessage());
         } catch (\Exception) {

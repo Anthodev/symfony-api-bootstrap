@@ -8,7 +8,7 @@ use App\Domain\User\Entity\User;
 
 class UserFactory
 {
-    public static function createUser(
+    public static function makeUser(
         string $email,
         string $username,
         string $password
@@ -21,12 +21,12 @@ class UserFactory
         return $user;
     }
 
-    public static function createVerifiedUser(
+    public static function makeVerifiedUser(
         string $email,
         string $username,
         string $password
     ): User {
-        $user = self::createUser($email, $username, $password);
+        $user = self::makeUser($email, $username, $password);
         $user->setEnabled(true);
 
         return $user;

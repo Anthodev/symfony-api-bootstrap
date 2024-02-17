@@ -56,6 +56,66 @@ tasks:
         status:
             - "{{.IS_CONTAINER_RUNNING}}"
         silent: false
+    
+    create-db:
+        aliases:
+            - cdb
+        desc: "Create the database"
+        cmds:
+            - "{{.DOCKER_COMPOSE}} exec -T {{.CONTAINER_SERVICE_PHP_NAME}} php bin/console doctrine:database:create --if-not-exists"
+        status:
+            - "{{.IS_CONTAINER_RUNNING}}"
+        silent: false
+    
+    create-db-test:
+        aliases:
+            - cdbt
+        desc: "Create the test database"
+        cmds:
+            - "{{.DOCKER_COMPOSE}} exec -T {{.CONTAINER_SERVICE_PHP_NAME}} php bin/console doctrine:database:create -e test --if-not-exists"
+        status:
+            - "{{.IS_CONTAINER_RUNNING}}"
+        silent: false
+    
+    migrate:
+        aliases:
+            - m
+        desc: "Run the migrations"
+        cmds:
+            - "{{.DOCKER_COMPOSE}} exec -T {{.CONTAINER_SERVICE_PHP_NAME}} php bin/console doctrine:migrations:migrate --no-interaction"
+        status:
+            - "{{.IS_CONTAINER_RUNNING}}"
+        silent: false
+    
+    migrate-test:
+        aliases:
+            - mt
+        desc: "Run the migrations for the test environment"
+        cmds:
+            - "{{.DOCKER_COMPOSE}} exec -T {{.CONTAINER_SERVICE_PHP_NAME}} php bin/console doctrine:migrations:migrate -e test --no-interaction"
+        status:
+            - "{{.IS_CONTAINER_RUNNING}}"
+        silent: false
+    
+    drop-db:
+        aliases:
+            - ddb
+        desc: "Drop the database"
+        cmds:
+            - "{{.DOCKER_COMPOSE}} exec -T {{.CONTAINER_SERVICE_PHP_NAME}} php bin/console doctrine:database:drop --force --if-exists"
+        status:
+            - "{{.IS_CONTAINER_RUNNING}}"
+        silent: false
+    
+    drop-db-test:
+        aliases:
+            - ddbt
+        desc: "Drop the test database"
+        cmds:
+            - "{{.DOCKER_COMPOSE}} exec -T {{.CONTAINER_SERVICE_PHP_NAME}} php bin/console doctrine:database:drop -e test --force --if-exists"
+        status:
+            - "{{.IS_CONTAINER_RUNNING}}"
+        silent: false
 
     tests:
         aliases:

@@ -6,7 +6,7 @@ namespace App\Domain\User\Dto;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-readonly class RegisterUserInput
+readonly class RegisterPendingRegistrationInput
 {
     public function __construct(
         #[Assert\NotBlank, Assert\Email]
