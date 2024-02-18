@@ -55,7 +55,7 @@ jobs:
         run: docker compose exec -T php vendor/bin/phpstan analyse
       -
         name: Generate JWT keypair
-        run: docker compose exec -T php vendor/bin/console lexik:jwt:generate-keypair --overwrite -q
+        run: docker compose exec -T php bin/console lexik:jwt:generate-keypair --overwrite -q
       -
         name: Run PestPHP
         run: docker compose run -e APP_ENV=test php php vendor/bin/pest
