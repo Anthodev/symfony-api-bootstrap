@@ -17,8 +17,10 @@ beforeEach(function () {
 });
 
 it('should return an array of subscribed events', function () {
+    // When
     $subscribedEvents = SendConfirmationEmailSubscriber::getSubscribedEvents();
 
+    // Then
     expect($subscribedEvents)
         ->toBeArray()
         ->toHaveKey(UserEventEnum::SEND_CONFIRMATION_EMAIL->value)

@@ -14,6 +14,7 @@ use Twig\Environment;
 use function Pest\Faker\fake;
 
 it('should send a confirmation email', function () {
+    // Given
     $mailer = $this->createMock(MailerInterface::class);
     $twig = $this->createMock(Environment::class);
 
@@ -40,6 +41,7 @@ it('should send a confirmation email', function () {
         )
     );
 
+    // Then
     $mailer
         ->expects(self::once())
         ->method('send')
@@ -51,10 +53,12 @@ it('should send a confirmation email', function () {
         $this->createMock(Environment::class),
     );
 
+    // When
     $userMail->sendConfirmationEmail($pendingRegistration);
 });
 
 it('should have correct url in the email', function () {
+    // Given
     $mailer = $this->getContainer()->get(MailerInterface::class);
     $twig = $this->getContainer()->get(Environment::class);
 
@@ -74,8 +78,10 @@ it('should have correct url in the email', function () {
         $twig,
     );
 
+    // When
     $userMail->sendConfirmationEmail($pendingRegistration);
 
+    // Then
     $this->assertEmailCount(1);
 
     /** @var RawMessage $email */

@@ -22,6 +22,7 @@ beforeEach(function () {
 });
 
 it('can register a pending registration', function () {
+    // Given
     $registerUserInput = new RegisterPendingRegistrationInput(
         email: fake()->email(),
         username: fake()->userName(),
@@ -34,8 +35,10 @@ it('can register a pending registration', function () {
         $this->eventDispatcher,
     );
 
+    // When
     $registerUserUseCase->registerPendingRegistration($registerUserInput);
 
+    // Then
     $pendingRegistration = $this->pendingRegistrationRepository->findOneBy(['email' => $registerUserInput->getEmail()]);
 
     expect($pendingRegistration)
@@ -63,6 +66,7 @@ it('can register a pending registration', function () {
 });
 
 it('cannot register a pending registration with an invalid password', function () {
+    // Given
     $registerUserInput = new RegisterPendingRegistrationInput(
         email: fake()->email(),
         username: fake()->userName(),
@@ -75,10 +79,12 @@ it('cannot register a pending registration with an invalid password', function (
         $this->eventDispatcher,
     );
 
+    // When
     $registerUserUseCase->registerPendingRegistration($registerUserInput);
 })->throws(ValidationException::class, 'Your password must be at least 12 characters long.');
 
 it('cannot register a pending registration with an invalid email', function () {
+    // Given
     $registerUserInput = new RegisterPendingRegistrationInput(
         email: fake()->word(),
         username: fake()->userName(),
@@ -91,10 +97,12 @@ it('cannot register a pending registration with an invalid email', function () {
         $this->eventDispatcher,
     );
 
+    // When
     $registerUserUseCase->registerPendingRegistration($registerUserInput);
 })->throws(ValidationException::class, 'This value is not a valid email address.');
 
 it('cannot register a pending registration with an existing email', function () {
+    // Given
     $registerUserInput = new RegisterPendingRegistrationInput(
         email: fake()->email(),
         username: fake()->userName(),
@@ -115,10 +123,12 @@ it('cannot register a pending registration with an existing email', function () 
         password: fake()->password(16),
     );
 
+    // When
     $registerUserUseCase->registerPendingRegistration($registerUserInput);
 })->throws(ValidationException::class, 'This email is already used.');
 
 it('cannot register a pending registration with an existing username', function () {
+    // Given
     $registerUserInput = new RegisterPendingRegistrationInput(
         email: fake()->email(),
         username: fake()->userName(),
@@ -139,10 +149,12 @@ it('cannot register a pending registration with an existing username', function 
         password: fake()->password(16),
     );
 
+    // When
     $registerUserUseCase->registerPendingRegistration($registerUserInput);
 })->throws(ValidationException::class, 'This username is already used.');
 
 it('cannot register a pending regsitration with an existing email and username', function () {
+    // Given
     $registerUserInput = new RegisterPendingRegistrationInput(
         email: fake()->email(),
         username: fake()->userName(),
@@ -163,10 +175,12 @@ it('cannot register a pending regsitration with an existing email and username',
         password: fake()->password(16),
     );
 
+    // When
     $registerUserUseCase->registerPendingRegistration($registerUserInput);
 })->throws(ValidationException::class, 'This email is already used.');
 
 it('cannot register a pending registration with an existing user email', function () {
+    // Given
     $email = fake()->email();
     $username = fake()->userName();
     $password = fake()->password(16);
@@ -193,5 +207,6 @@ it('cannot register a pending registration with an existing user email', functio
         $this->eventDispatcher,
     );
 
+    // When
     $registerUserUseCase->registerPendingRegistration($registerUserInput);
 })->throws(ValidationException::class, 'This email is already used.');

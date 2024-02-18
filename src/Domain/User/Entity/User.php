@@ -89,7 +89,7 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
         return $this->plainPassword;
     }
 
-    public function setPlainPassword(string $plainPassword): static
+    public function setPlainPassword(?string $plainPassword): static
     {
         $this->plainPassword = $plainPassword;
 

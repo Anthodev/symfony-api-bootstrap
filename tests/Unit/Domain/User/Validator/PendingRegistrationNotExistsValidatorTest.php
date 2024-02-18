@@ -41,6 +41,7 @@ class PendingRegistrationNotExistsValidatorTest extends ConstraintValidatorTestC
 
     public function testPendingRegistrationWithUsernameExists(): void
     {
+        // Given
         $emailPendingFaked = $this->faker->email();
         $emailUserFaked = $this->faker->email();
         $username = $this->faker->userName();
@@ -72,7 +73,10 @@ class PendingRegistrationNotExistsValidatorTest extends ConstraintValidatorTestC
             $password,
         );
 
+        // When
         $this->validator->validate($pendingRegistration, new PendingRegistrationNotExists());
+
+        // Then
         $this
             ->buildViolation('This username is already used.')
             ->setCode(PendingRegistrationNotExists::USERNAME_EXISTS_ERROR_CODE)
@@ -82,6 +86,7 @@ class PendingRegistrationNotExistsValidatorTest extends ConstraintValidatorTestC
 
     public function testPendingRegistrationWithEmailExists(): void
     {
+        // Given
         $email = $this->faker->email();
         $usernamePendingFaked = $this->faker->userName();
         $usernameUserFaked = $this->faker->userName();
@@ -113,7 +118,10 @@ class PendingRegistrationNotExistsValidatorTest extends ConstraintValidatorTestC
             $password,
         );
 
+        // When
         $this->validator->validate($pendingRegistration, new PendingRegistrationNotExists());
+
+        // Then
         $this
             ->buildViolation('This email is already used.')
             ->setCode(PendingRegistrationNotExists::EMAIL_EXISTS_ERROR_CODE)
@@ -123,6 +131,7 @@ class PendingRegistrationNotExistsValidatorTest extends ConstraintValidatorTestC
 
     public function testPendingRegistrationWithEmailExistsOnUser(): void
     {
+        // Given
         $email = $this->faker->email();
         $usernamePendingFaked = $this->faker->userName();
         $usernameUserFaked = $this->faker->userName();
@@ -160,7 +169,10 @@ class PendingRegistrationNotExistsValidatorTest extends ConstraintValidatorTestC
             $password,
         );
 
+        // When
         $this->validator->validate($pendingRegistration, new PendingRegistrationNotExists());
+
+        // Then
         $this
             ->buildViolation('This email is already used.')
             ->setCode(PendingRegistrationNotExists::EMAIL_EXISTS_ERROR_CODE)

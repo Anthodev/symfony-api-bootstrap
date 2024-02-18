@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\User\Repository;
 
+use App\Application\Common\Exception\EntityNotFoundException;
 use App\Application\Common\Repository\BaseEntityRepository;
 use App\Domain\User\Entity\PendingRegistration;
 use Doctrine\ORM\NonUniqueResultException;
@@ -30,5 +31,26 @@ class PendingRegistrationRepository extends BaseEntityRepository
 
         /** @var PendingRegistration|null */
         return $query->getOneOrNullResult();
+    }
+
+    /**
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    public function findOneByTokenOrFail(string $token): PendingRegistration
+    {
+        $query = $this->createQueryBuilder('pr')
+            ->where('pr.token = :token')
+            ->setParameter('token', $token)
+            ->getQuery();
+
+        /** @var PendingRegistration|null $pendingRegistration */
+        $pendingRegistration = $query->getOneOrNullResult();
+
+        if (null === $pendingRegistration) {
+            throw new EntityNotFoundException();
+        }
+
+        return $pendingRegistration;
     }
 }
