@@ -19,9 +19,8 @@ abstract class BaseEntityRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function remove(EntityInterface $entity): void
+    public function delete(EntityInterface $entity): void
     {
-        $this->validatorService->validate($entity);
         $this->getEntityManager()->remove($entity);
         $this->getEntityManager()->flush();
     }

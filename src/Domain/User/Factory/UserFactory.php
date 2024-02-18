@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Domain\User\Factory;
 
+use App\Domain\User\Entity\PendingRegistration;
 use App\Domain\User\Entity\User;
 
 class UserFactory
 {
-    public static function createUser(
+    public static function makeUser(
         string $email,
         string $username,
         string $password
@@ -21,13 +22,27 @@ class UserFactory
         return $user;
     }
 
-    public static function createVerifiedUser(
+    public static function makeVerifiedUser(
         string $email,
         string $username,
         string $password
     ): User {
-        $user = self::createUser($email, $username, $password);
+        $user = self::makeUser($email, $username, $password);
         $user->setEnabled(true);
+
+        return $user;
+    }
+
+    public static function makeVerifiedUserFromPendingRegistration(
+        PendingRegistration $pendingRegistration
+    ): User {
+        $user = new User();
+        $user->setEmail($pendingRegistration->getEmail());
+        $user->setUsername($pendingRegistration->getUsername());
+        $user->setPassword($pendingRegistration->getPassword());
+        $user->setRole($pendingRegistration->getRole());
+        $user->setEnabled(true);
+        $user->setPlainPassword(null);
 
         return $user;
     }

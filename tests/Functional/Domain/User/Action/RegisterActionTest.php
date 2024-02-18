@@ -6,9 +6,15 @@ namespace App\Tests\Functional\Domain\User\Action;
 
 use App\Application\Common\Enum\HttpMethodEnum;
 
+use App\Domain\User\Enum\RoleCodeEnum;
+use App\Domain\User\Factory\UserFactory;
+use App\Domain\User\Repository\RoleRepository;
+use App\Domain\User\Repository\UserRepository;
+
 use function Pest\Faker\fake;
 
 it('can register a user', function () {
+    // When
     static::$client->request(
         HttpMethodEnum::POST->value,
         '/api/register',
@@ -19,12 +25,14 @@ it('can register a user', function () {
         ]
     );
 
+    // Then
     $response = static::$client->getResponse();
 
     expect($response->getStatusCode())->toBe(201);
 });
 
 it('cannot register a user with an invalid password', function () {
+    // When
     static::$client->request(
         HttpMethodEnum::POST->value,
         '/api/register',
@@ -35,6 +43,7 @@ it('cannot register a user with an invalid password', function () {
         ]
     );
 
+    // Then
     $response = static::$client->getResponse();
 
     expect($response->getStatusCode())->toBe(422);
@@ -45,6 +54,7 @@ it('cannot register a user with an invalid password', function () {
 });
 
 it('cannot register a user with an invalid email', function () {
+    // When
     static::$client->request(
         HttpMethodEnum::POST->value,
         '/api/register',
@@ -55,6 +65,7 @@ it('cannot register a user with an invalid email', function () {
         ]
     );
 
+    // Then
     $response = static::$client->getResponse();
 
     expect($response->getStatusCode())->toBe(422);
@@ -65,8 +76,10 @@ it('cannot register a user with an invalid email', function () {
 });
 
 it('cannot register a user with an existing email', function () {
+    // Given
     $email = fake()->email();
 
+    // When
     static::$client->request(
         HttpMethodEnum::POST->value,
         '/api/register',
@@ -77,6 +90,7 @@ it('cannot register a user with an existing email', function () {
         ]
     );
 
+    // Then
     $response = static::$client->getResponse();
 
     expect($response->getStatusCode())->toBe(201);
@@ -101,8 +115,10 @@ it('cannot register a user with an existing email', function () {
 });
 
 it('cannot register a user with an existing username', function () {
+    // Given
     $username = fake()->userName();
 
+    // When
     static::$client->request(
         HttpMethodEnum::POST->value,
         '/api/register',
@@ -113,6 +129,7 @@ it('cannot register a user with an existing username', function () {
         ]
     );
 
+    // Then
     $response = static::$client->getResponse();
 
     expect($response->getStatusCode())->toBe(201);
@@ -137,6 +154,7 @@ it('cannot register a user with an existing username', function () {
 });
 
 it('cannot register a user with an invalid payload', function () {
+    // When
     static::$client->request(
         HttpMethodEnum::POST->value,
         '/api/register',
@@ -146,6 +164,7 @@ it('cannot register a user with an invalid payload', function () {
         ]
     );
 
+    // Then
     $response = static::$client->getResponse();
 
     expect($response->getStatusCode())->toBe(422);
@@ -153,4 +172,44 @@ it('cannot register a user with an invalid payload', function () {
     json_validate($response->getContent());
     $data = json_decode($response->getContent(), true);
     expect($data['message'])->toContain('This value should be of type unknown.');
+});
+
+it('cannot register a pending registration with an existing user email', function () {
+    // Given
+    $userRepository = $this->getContainer()->get(UserRepository::class);
+    $roleRepository = $this->getContainer()->get(RoleRepository::class);
+
+    $email = fake()->email();
+    $username = fake()->userName();
+    $password = fake()->password(16);
+
+    $roleUser = $roleRepository->findOneBy(['code' => RoleCodeEnum::ROLE_USER->value]);
+
+    $user = UserFactory::makeUser(
+        email: $email,
+        username: $username,
+        password: $password,
+    );
+    $user->setRole($roleUser);
+    $userRepository->save($user);
+
+    // When
+    static::$client->request(
+        HttpMethodEnum::POST->value,
+        '/api/register',
+        [
+            'email' => $email,
+            'username' => fake()->userName(),
+            'password' => fake()->password(16),
+        ]
+    );
+
+    // Then
+    $response = static::$client->getResponse();
+
+    expect($response->getStatusCode())->toBe(400);
+
+    json_validate($response->getContent());
+    $data = json_decode($response->getContent(), true);
+    expect($data['message'])->toContain('This email is already used.');
 });
