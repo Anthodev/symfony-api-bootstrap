@@ -49,6 +49,21 @@ class UserRepository extends BaseEntityRepository implements UserLoaderInterface
     /**
      * @throws NonUniqueResultException
      */
+    public function getOneByIdEnabled(string $id): ?User
+    {
+        $query = $this->createQueryBuilder('u')
+            ->where('u.id = :id')
+            ->andWhere('u.enabled = true')
+            ->setParameter('id', $id)
+            ->getQuery();
+
+        /** @var User|null */
+        return $query->getOneOrNullResult();
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     */
     #[\Override]
     public function loadUserByIdentifier(string $identifier): ?UserInterface
     {
