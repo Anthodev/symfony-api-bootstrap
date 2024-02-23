@@ -7,6 +7,7 @@ namespace App\Domain\User\Entity;
 use App\Application\Common\Entity\EntityInterface;
 use App\Application\Common\Entity\Trait\IdTrait;
 use App\Application\Common\Entity\Trait\TimestampableTrait;
+use App\Application\Common\Enum\SerializerGroupNameEnum;
 use App\Domain\User\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,6 +15,8 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -29,23 +32,29 @@ class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserI
 
     #[Assert\NotBlank, Assert\Email]
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
+    #[Groups([SerializerGroupNameEnum::DEFAULT_READ->value])]
     private string $email;
 
     #[Assert\NotBlank, Assert\Length(min: 3, max: 255)]
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
+    #[Groups([SerializerGroupNameEnum::DEFAULT_READ->value])]
     private string $username;
 
+    #[Ignore]
     #[Assert\Length(min: 12, max: 255, minMessage: 'Your password must be at least {{ limit }} characters long.')]
     #[ORM\Column(type: Types::STRING, length: 255)]
     private string $password;
 
+    #[Ignore]
     #[Assert\Length(min: 12, max: 255, minMessage: 'Your password must be at least {{ limit }} characters long.'), Assert\PasswordStrength]
     private ?string $plainPassword;
 
+    #[Ignore]
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $enabled = false;
 
     #[ORM\ManyToOne(targetEntity: Role::class)]
+    #[Groups([SerializerGroupNameEnum::DEFAULT_READ->value])]
     private Role $role;
 
     public function getEmail(): string
