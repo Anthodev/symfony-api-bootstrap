@@ -35,6 +35,18 @@ class UserRepository extends BaseEntityRepository implements UserLoaderInterface
     }
 
     /**
+     * @return User[]
+     */
+    public function getAllEnabled(): array
+    {
+        /** @var User[] */
+        return $this->createQueryBuilder('u')
+            ->where('u.enabled = true')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @throws NonUniqueResultException
      */
     #[\Override]
