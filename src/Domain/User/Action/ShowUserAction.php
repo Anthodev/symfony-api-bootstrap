@@ -25,7 +25,7 @@ readonly class ShowUserAction extends BaseAction
     {
         $user = $this->userRepository->getOneByIdEnabled($id);
 
-        if ($user === null) {
+        if (null === $user) {
             throw new EntityNotFoundHttpException($id);
         }
 
