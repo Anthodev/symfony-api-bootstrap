@@ -5,39 +5,39 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Domain\User\Action;
 
 use App\Application\Common\Enum\HttpMethodEnum;
+use App\Domain\User\Entity\User;
+use App\Domain\User\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 use function Pest\Faker\fake;
 
-it('can get an user', function () {
-    $user = $this->makeUser();
+it('can delete an user', function () {
+    $this->makeUser();
+
+    $email = fake()->email();
+
+    $user = $this->makeUser(
+        email: $email,
+        username: fake()->userName(),
+        password: fake()->password(),
+    );
 
     $this->loginUser(self::DEFAULT_USER_EMAIL);
 
-    static::$client->request(HttpMethodEnum::GET->value, '/api/users/' . $user->getId()->toRfc4122());
+    static::$client->request(HttpMethodEnum::DELETE->value, '/api/users/' . $user->getId()->toRfc4122());
     $response = static::$client->getResponse();
 
-    expect($response->getStatusCode())->toBe(Response::HTTP_OK);
-    expect($response->getContent())->toBeJson();
+    expect($response->getStatusCode())->toBe(Response::HTTP_NO_CONTENT);
 
-    $data = json_decode($response->getContent(), true);
+    $entityManager = static::getContainer()->get(EntityManagerInterface::class);
+    $userRepository = $entityManager->getRepository(User::class);
+    $user = $userRepository->findOneBy(['email' => $email]);
 
-    expect($data['id'])
-        ->toBeString()
-        ->toBe($user->getId()->toRfc4122())
-        ->and($data['createdAt'])
-            ->toBeString()
-            ->toBe($user->getCreatedAt()->format(\DateTimeInterface::ATOM))
-        ->and($data['updatedAt'])
-            ->toBeString()
-            ->toBe($user->getUpdatedAt()->format(\DateTimeInterface::ATOM))
-        ->and($data['role']['id'])
-            ->toBeString()
-            ->toBe($user->getRole()->getId()->toRfc4122())
-    ;
+    expect($user)->toBeNull();
 });
 
-it('cannot get an user if not authenticated', function () {
+it('cannot delete the user list if not authenticated', function () {
     $fakeUuid = fake()->uuid();
 
     static::$client->request(HttpMethodEnum::GET->value, '/api/users/' . $fakeUuid);
@@ -48,14 +48,14 @@ it('cannot get an user if not authenticated', function () {
     expect($response->getContent(false))->toBe('{"code":401,"message":"JWT Token not found"}');
 });
 
-it('cannot get an user that does not exist', function () {
+it('cannot delete an user that does not exist', function () {
     $this->makeUser();
 
     $this->loginUser(self::DEFAULT_USER_EMAIL);
 
     $fakeUuid = fake()->uuid();
 
-    static::$client->request(HttpMethodEnum::GET->value, '/api/users/' . $fakeUuid);
+    static::$client->request(HttpMethodEnum::DELETE->value, '/api/users/' . $fakeUuid);
     $response = static::$client->getResponse();
 
     expect($response->getStatusCode())->toBe(Response::HTTP_NOT_FOUND);
@@ -63,7 +63,7 @@ it('cannot get an user that does not exist', function () {
     expect($response->getContent(false))->toBe('{"code":404,"message":"Data not found with id ' . $fakeUuid . '"}');
 });
 
-it('cannot get an user that is disabled', function () {
+it('cannot delete an user that is disabled', function () {
     $this->makeUser();
 
     $user = $this->makeUser(
@@ -75,7 +75,7 @@ it('cannot get an user that is disabled', function () {
 
     $this->loginUser(self::DEFAULT_USER_EMAIL);
 
-    static::$client->request(HttpMethodEnum::GET->value, '/api/users/' . $user->getId()->toRfc4122());
+    static::$client->request(HttpMethodEnum::DELETE->value, '/api/users/' . $user->getId()->toRfc4122());
     $response = static::$client->getResponse();
 
     expect($response->getStatusCode())->toBe(Response::HTTP_NOT_FOUND);
