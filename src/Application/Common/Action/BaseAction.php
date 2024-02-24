@@ -22,10 +22,16 @@ abstract readonly class BaseAction
      * @param string[] $groups
      */
     protected function output(
-        mixed $data,
+        mixed $data = null,
         int $status = Response::HTTP_OK,
         array $groups = [],
     ): Response {
+        if (null === $data) {
+            return new JsonResponse(
+                status: $status,
+            );
+        }
+
         $groups = array_merge($groups, [SerializerGroupNameEnum::DEFAULT_READ->value]);
 
         $contexts = [

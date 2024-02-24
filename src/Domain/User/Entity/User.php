@@ -11,6 +11,7 @@ use App\Application\Common\Enum\SerializerGroupNameEnum;
 use App\Domain\User\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -24,6 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['email'], message: 'This email is already used.')]
 #[UniqueEntity(fields: ['username'], message: 'This username is already used.')]
+#[Gedmo\SoftDeleteable(hardDelete: false)]
 class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserInterface
 {
     use IdTrait;
