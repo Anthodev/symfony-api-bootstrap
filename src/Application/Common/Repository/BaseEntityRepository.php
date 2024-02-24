@@ -12,6 +12,12 @@ abstract class BaseEntityRepository extends ServiceEntityRepository
     #[Required]
     public ValidatorService $validatorService;
 
+    public function update(EntityInterface $entity): void
+    {
+        $this->validatorService->validate($entity);
+        $this->getEntityManager()->flush();
+    }
+
     public function save(EntityInterface $entity): void
     {
         $this->validatorService->validate($entity);

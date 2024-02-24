@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\Domain\User\EventListener;
 
 use App\Domain\User\Entity\User;
+use App\Domain\User\Security\PasswordChanger;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsEntityListener(event: Events::prePersist, method: Events::prePersist, entity: User::class)]
 #[AsEntityListener(event: Events::preUpdate, method: Events::preUpdate, entity: User::class)]
 readonly class UserHashPassword
 {
     public function __construct(
-        private UserPasswordHasherInterface $passwordHasher,
+        private PasswordChanger $passwordChanger,
     ) {
     }
 
@@ -26,6 +26,8 @@ readonly class UserHashPassword
     public function preUpdate(User $user): void
     {
         $this->hashPassword($user);
+
+        $user->setUpdatedAt(new \DateTime());
     }
 
     private function hashPassword(User $user): void
@@ -34,8 +36,6 @@ readonly class UserHashPassword
             return;
         }
 
-        $hashedPassword = $this->passwordHasher->hashPassword($user, $user->getPlainPassword());
-        $user->setPassword($hashedPassword);
-        $user->eraseCredentials();
+        $this->passwordChanger->changePassword($user);
     }
 }
