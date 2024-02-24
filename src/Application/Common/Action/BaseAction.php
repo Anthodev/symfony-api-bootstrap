@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Application\Common\Action;
 
 use App\Application\Common\Enum\SerializerGroupNameEnum;
+use App\Application\Common\Exception\AccessDeniedHttpException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
@@ -15,9 +17,13 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Contracts\Service\Attribute\Required;
 
-abstract readonly class BaseAction
+abstract class BaseAction
 {
+    #[Required]
+    public Security $security;
+
     /**
      * @param string[] $groups
      */
@@ -65,5 +71,12 @@ abstract readonly class BaseAction
             status: $status,
             json: true,
         );
+    }
+
+    protected function denyAccessUnlessGranted(string $attribute, mixed $subject = null): void
+    {
+        if (!$this->security->isGranted($attribute, $subject)) {
+            throw new AccessDeniedHttpException();
+        }
     }
 }

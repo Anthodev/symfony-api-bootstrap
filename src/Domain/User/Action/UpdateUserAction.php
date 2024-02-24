@@ -12,6 +12,7 @@ use App\Application\Common\Exception\EntityNotFoundHttpException;
 use App\Application\Common\Exception\ValidationException;
 use App\Domain\User\Dto\UpdateUserInputDto;
 use App\Domain\User\Repository\UserRepository;
+use App\Domain\User\Security\UserVoter;
 use App\Domain\User\UseCase\UpdateUserUseCase;
 use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,11 +21,11 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-readonly class UpdateUserAction extends BaseAction
+class UpdateUserAction extends BaseAction
 {
     public function __construct(
-        private UserRepository $userRepository,
-        private UpdateUserUseCase $updateUserUseCase,
+        private readonly UserRepository $userRepository,
+        private readonly UpdateUserUseCase $updateUserUseCase,
     ) {
     }
 
@@ -41,6 +42,8 @@ readonly class UpdateUserAction extends BaseAction
         if (null === $user) {
             throw new EntityNotFoundHttpException($id);
         }
+
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
         try {
             $this->updateUserUseCase->updateUser($userInputDto, $user);

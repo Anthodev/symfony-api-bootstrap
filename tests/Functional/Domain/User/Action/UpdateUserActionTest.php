@@ -12,7 +12,7 @@ use function Pest\Faker\fake;
 
 it('can update an user', function () {
     // Given
-    $user = $this->makeUser();
+    $user = $this->makeDefaultUser();
 
     $this->loginUser(self::DEFAULT_USER_EMAIL);
 
@@ -61,7 +61,7 @@ it('can update an user', function () {
 
 it('can update the password of an user', function () {
     // Given
-    $user = $this->makeUser();
+    $user = $this->makeDefaultUser();
 
     $this->loginUser(self::DEFAULT_USER_EMAIL);
 
@@ -119,7 +119,7 @@ it('can update the password of an user', function () {
 
 it('can update the username and the password of an user', function () {
     // Given
-    $user = $this->makeUser();
+    $user = $this->makeDefaultUser();
 
     $this->loginUser(self::DEFAULT_USER_EMAIL);
 
@@ -179,7 +179,7 @@ it('can update the username and the password of an user', function () {
 
 it('cannot update a user that does not exist', function () {
     // Given
-    $user = $this->makeUser();
+    $user = $this->makeDefaultUser();
     $this->loginUser(self::DEFAULT_USER_EMAIL);
 
     $fakeUuid = fake()->uuid();
@@ -206,7 +206,7 @@ it('cannot update a user that does not exist', function () {
 
 it('cannot update a disabled user', function () {
     // Given
-    $this->makeUser();
+    $this->makeDefaultUser();
 
     $user = $this->makeUser(
         email: fake()->email(),
@@ -235,4 +235,36 @@ it('cannot update a disabled user', function () {
     expect($response->getStatusCode())->toBe(Response::HTTP_NOT_FOUND);
     expect($response->getContent())->toBeJson();
     expect($response->getContent(false))->toBe('{"code":404,"message":"Data not found with id ' . $user->getId()->toRfc4122() . '"}');
+});
+
+it('cannot update another user with a role user', function () {
+    // Given
+    $this->makeUser();
+
+    $user = $this->makeUser(
+        email: fake()->email(),
+        username: fake()->userName(),
+        password: fake()->password(),
+    );
+
+    $this->loginUser(self::DEFAULT_USER_EMAIL);
+
+    $dataEncoded = json_encode([
+        'email' => fake()->email(),
+        'username' => fake()->userName(),
+    ], JSON_THROW_ON_ERROR);
+
+    // When
+    static::$client->request(
+        method: HttpMethodEnum::PATCH->value,
+        uri: '/api/users/' . $user->getId()->toRfc4122(),
+        content: $dataEncoded,
+    );
+
+    // Then
+    $response = static::$client->getResponse();
+
+    expect($response->getStatusCode())->toBe(Response::HTTP_FORBIDDEN);
+    expect($response->getContent())->toBeJson();
+    expect($response->getContent(false))->toBe('{"code":403,"message":"You do not have sufficient permissions to access this resource."}');
 });
