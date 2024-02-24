@@ -13,15 +13,15 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-readonly class ShowUserAction extends BaseAction
+class ShowUserAction extends BaseAction
 {
     public function __construct(
-        private UserRepository $userRepository,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
     #[Route('/users/{id}', methods: [HttpMethodEnum::GET->value])]
-    public function getUsers(string $id): Response
+    public function getUser(string $id): Response
     {
         $user = $this->userRepository->getOneByIdEnabled($id);
 

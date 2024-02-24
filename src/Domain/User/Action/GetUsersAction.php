@@ -12,10 +12,10 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-readonly class GetUsersAction extends BaseAction
+class GetUsersAction extends BaseAction
 {
     public function __construct(
-        private UserRepository $userRepository,
+        private readonly UserRepository $userRepository,
     ) {
     }
 
