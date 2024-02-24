@@ -7,6 +7,8 @@ namespace App\Tests\Functional\Domain\User\Action;
 use App\Application\Common\Enum\HttpMethodEnum;
 use Symfony\Component\HttpFoundation\Response;
 
+use function Pest\Faker\fake;
+
 it('can get a user', function () {
     $user = $this->makeUser();
 
@@ -49,10 +51,31 @@ it('cannot get an user that does not exist', function () {
 
     $this->loginUser(self::DEFAULT_USER_EMAIL);
 
-    static::$client->request(HttpMethodEnum::GET->value, '/api/users/a48f3176-49b6-4ec3-ab16-72b8c741d099');
+    $fakeUuid = fake()->uuid();
+
+    static::$client->request(HttpMethodEnum::GET->value, '/api/users/' . $fakeUuid);
     $response = static::$client->getResponse();
 
     expect($response->getStatusCode())->toBe(Response::HTTP_NOT_FOUND);
     expect($response->getContent())->toBeJson();
-    expect($response->getContent(false))->toBe('{"code":404,"message":"Data not found with id a48f3176-49b6-4ec3-ab16-72b8c741d099"}');
+    expect($response->getContent(false))->toBe('{"code":404,"message":"Data not found with id ' . $fakeUuid . '"}');
+});
+
+it('cannot update an user that is disabled', function () {
+    $this->makeUser();
+    $user = $this->makeUser(
+        email: fake()->email(),
+        username: fake()->userName(),
+        password: fake()->password(),
+        enabled: false,
+    );
+
+    $this->loginUser(self::DEFAULT_USER_EMAIL);
+
+    static::$client->request(HttpMethodEnum::GET->value, '/api/users/' . $user->getId()->toRfc4122());
+    $response = static::$client->getResponse();
+
+    expect($response->getStatusCode())->toBe(Response::HTTP_NOT_FOUND);
+    expect($response->getContent())->toBeJson();
+    expect($response->getContent(false))->toBe('{"code":404,"message":"Data not found with id ' . $user->getId()->toRfc4122() . '"}');
 });

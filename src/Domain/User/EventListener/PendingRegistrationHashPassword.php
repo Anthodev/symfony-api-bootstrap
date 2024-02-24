@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace App\Domain\User\EventListener;
 
 use App\Domain\User\Entity\PendingRegistration;
+use App\Domain\User\Security\PasswordChanger;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsEntityListener(event: Events::prePersist, method: Events::prePersist, entity: PendingRegistration::class)]
 #[AsEntityListener(event: Events::preUpdate, method: Events::preUpdate, entity: PendingRegistration::class)]
 readonly class PendingRegistrationHashPassword
 {
     public function __construct(
-        private UserPasswordHasherInterface $passwordHasher,
+        private PasswordChanger $passwordChanger,
     ) {
     }
 
@@ -38,8 +38,6 @@ readonly class PendingRegistrationHashPassword
             return;
         }
 
-        $hashedPassword = $this->passwordHasher->hashPassword($pendingRegistration, $pendingRegistration->getPlainPassword());
-        $pendingRegistration->setPassword($hashedPassword);
-        $pendingRegistration->eraseCredentials();
+        $this->passwordChanger->changePassword($pendingRegistration);
     }
 }
