@@ -1,9 +1,30 @@
-# Symfony Docker
+# Symfony Api Bootstrap
 
-A [Docker](https://www.docker.com/)-based installer and runtime for the [Symfony](https://symfony.com) web framework,
-with [FrankenPHP](https://frankenphp.dev) and [Caddy](https://caddyserver.com/) inside!
+A bootstrap api project for Symfony 7.0 with PHP 8.3, based on my fork of [symfony-docker](https://github.com/Anthodev/symfony-docker) (using Frankenphp) from [Kévin Dunglas](https://dunglas.dev).
 
-![CI](https://github.com/anthodev/symfony-docker/workflows/CI/badge.svg)
+![GitHub license](https://img.shields.io/github/license/anthodev/symfony-api-bootstrap) ![CI](https://github.com/anthodev/symfony-api-bootstrap/workflows/CI/badge.svg) ![GitHub issues](https://img.shields.io/github/issues/anthodev/symfony-api-bootstrap)
+
+## Features
+
+* PHP 8.3 & Symfony 7.0
+* Confirmation email system
+* The security system is already configured
+* User and role entities are ready
+* A Voter system is already in place
+* Tests are present and ready to be run
+* The CI is already configured and working
+
+## Routes available
+```
+GET     /api/ping
+POST    /api/register                   (payload: email, username, plainPassword)
+GET     /api/register/confirm/{token}
+GET     /api/auth_ping                  (protected route)
+GET     /api/users                      (protected route)
+GET     /api/users/{id}                 (protected route)
+PATCH   /api/users/{id}                 (protected route, payload: email, username, plainPassword)
+DELETE  /api/users/{id}                 (protected route)
+```
 
 ## Getting Started
 
@@ -13,37 +34,34 @@ with [FrankenPHP](https://frankenphp.dev) and [Caddy](https://caddyserver.com/) 
 4. Open `https://localhost` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
 5. Run `docker compose down --remove-orphans` to stop the Docker containers.
 
-## Features
+### Taskfile
+A `Taskfile` is included to help you with common tasks. Run `task` to see the available commands.
 
-* Production, development and CI ready
-* Just 1 service by default
-* Blazing-fast performance thanks to [the worker mode of FrankenPHP](https://github.com/dunglas/frankenphp/blob/main/docs/worker.md) (automatically enabled in prod mode)
-* [Installation of extra Docker Compose services](docs/extra-services.md) with Symfony Flex
-* Automatic HTTPS (in dev and prod)
-* HTTP/3 and [Early Hints](https://symfony.com/blog/new-in-symfony-6-3-early-hints) support
-* Real-time messaging thanks to a built-in [Mercure hub](https://symfony.com/doc/current/mercure.html)
-* [Vulcain](https://vulcain.rocks) support
-* Native [XDebug](docs/xdebug.md) integration
-* Super-readable configuration
-
-**Enjoy!**
-
-## Docs
-
-1. [Build options](docs/build.md)
-2. [Using Symfony Docker with an existing project](docs/existing-project.md)
-3. [Support for extra services](docs/extra-services.md)
-4. [Deploying in production](docs/production.md)
-5. [Debugging with Xdebug](docs/xdebug.md)
-6. [TLS Certificates](docs/tls.md)
-7. [Using a Makefile](docs/makefile.md)
-8. [Troubleshooting](docs/troubleshooting.md)
-9. [Updating the template](docs/updating.md)
+Task commands:
+```
+* bash:                   Open a bash session                              (aliases: b)
+* build-dev:              Build the development environment                (aliases: bd)
+* composer-install:       Install the composer dependencies                (aliases: c)
+* composer-require:       Require a composer package                       (aliases: cr)
+* create-db:              Create the database                              (aliases: cdb)
+* create-db-test:         Create the test database                         (aliases: cdbt)
+* drop-db:                Drop the database                                (aliases: ddb)
+* drop-db-test:           Drop the test database                           (aliases: ddbt)
+* ecs:                    Run the code style fixer                         (aliases: e)
+* migrate:                Run the migrations                               (aliases: m)
+* migrate-test:           Run the migrations for the test environment      (aliases: mt)
+* prune:                  Remove all stopped containers                    (aliases: p)
+* stan:                   Run the static analysis                          (aliases: st)
+* stop:                   Stop the containers                              (aliases: s)
+* tests:                  Run the tests                                    (aliases: t)
+* up:                     Start the containers                             (aliases: u)
+* up-db:                  Start the database container                     (aliases: udb)
+```
 
 ## License
 
-Symfony Docker is available under the MIT License.
+Symfony Api Bootstrap is available under the MIT License.
 
 ## Credits
 
-Created by [Kévin Dunglas](https://dunglas.dev), co-maintained by [Maxime Helias](https://twitter.com/maxhelias) and sponsored by [Les-Tilleuls.coop](https://les-tilleuls.coop).
+Created by [Cedric Anthony](https://antho.dev), based on my fork of [symfony-docker](https://github.com/Anthodev/symfony-docker) from [Kévin Dunglas](https://dunglas.dev).
